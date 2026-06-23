@@ -1,0 +1,424 @@
+/* ===========================
+   Cyber Café 2099 — Main CSS
+   =========================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg:     #070b17;
+  --panel:  rgba(15, 20, 40, 0.65);
+  --cyan:   #00e5ff;
+  --pink:   #ff2fd1;
+  --purple: #8c52ff;
+  --text:   #e8f6ff;
+  --soft:   #9ab0c9;
+  --border: rgba(255,255,255,0.08);
+}
+
+/* ---------- Base ---------- */
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: radial-gradient(circle at top, #121d3d 0%, #070b17 60%);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Grid overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ---------- Rain ---------- */
+.rain {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.drop {
+  position: absolute;
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.4));
+  animation: rain linear infinite;
+}
+
+@keyframes rain {
+  from { transform: translateY(-100px); }
+  to   { transform: translateY(110vh); }
+}
+
+/* ---------- Navbar ---------- */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 8%;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(5, 8, 18, 0.6);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  color: var(--cyan);
+  text-shadow: 0 0 12px var(--cyan);
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  transition: 0.3s;
+  font-size: 18px;
+}
+
+.nav-links a:hover {
+  color: var(--pink);
+  text-shadow: 0 0 10px var(--pink);
+}
+
+/* ---------- Sections ---------- */
+section {
+  padding: 100px 8%;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-title h2 {
+  font-size: 52px;
+  font-family: 'Orbitron', sans-serif;
+  color: var(--cyan);
+  margin-bottom: 15px;
+}
+
+.section-title p {
+  color: var(--soft);
+  font-size: 20px;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8%;
+  gap: 50px;
+}
+
+.hero-text { max-width: 600px; }
+
+.hero-text h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 72px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.glow {
+  color: var(--cyan);
+  text-shadow:
+    0 0 10px var(--cyan),
+    0 0 20px var(--cyan),
+    0 0 40px var(--cyan);
+}
+
+.hero-text p {
+  font-size: 22px;
+  color: var(--soft);
+  margin-bottom: 35px;
+  line-height: 1.6;
+}
+
+/* ---------- Buttons ---------- */
+.btn-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 15px 30px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  transition: 0.4s;
+  text-decoration: none;
+  display: inline-block;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.primary {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: black;
+  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+
+.secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid var(--cyan);
+}
+
+.btn:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+/* ---------- Hero Card ---------- */
+.hero-card {
+  width: 420px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 0 40px rgba(0,229,255,0.15);
+}
+
+.hero-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
+  color: var(--pink);
+}
+
+.music-box {
+  background: rgba(255,255,255,0.04);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Music Wave ---------- */
+.music-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 50px;
+  margin-top: 15px;
+}
+
+.music-wave span {
+  width: 8px;
+  background: var(--cyan);
+  border-radius: 20px;
+  animation: wave 1s infinite ease-in-out;
+}
+
+.music-wave span:nth-child(2) { animation-delay: 0.1s; }
+.music-wave span:nth-child(3) { animation-delay: 0.2s; }
+.music-wave span:nth-child(4) { animation-delay: 0.3s; }
+.music-wave span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes wave {
+  0%, 100% { height: 10px; }
+  50%       { height: 45px; }
+}
+
+/* ---------- Feature Cards ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 25px;
+  padding: 35px;
+  transition: 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(0,229,255,0.08);
+  border-radius: 50%;
+  top: -80px;
+  right: -80px;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 0 35px rgba(0,229,255,0.2);
+}
+
+.feature-card h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: var(--pink);
+}
+
+.feature-card p {
+  color: var(--soft);
+  line-height: 1.7;
+  font-size: 18px;
+}
+
+/* ---------- Study Tables ---------- */
+.study-room {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.table-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.status {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.blue   { background: cyan;   box-shadow: 0 0 12px cyan; }
+.purple { background: violet; box-shadow: 0 0 12px violet; }
+.red    { background: red;    box-shadow: 0 0 12px red; }
+
+/* ---------- Chat ---------- */
+.chat-box {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid var(--border);
+}
+
+.messages {
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.msg {
+  padding: 12px 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.05);
+}
+
+.msg strong { color: var(--cyan); }
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+}
+
+.chat-input button {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 12px;
+  background: var(--cyan);
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.chat-input button:hover {
+  background: var(--purple);
+  color: white;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  padding: 40px 8%;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--soft);
+  background: rgba(0,0,0,0.3);
+}
+
+footer h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+
+/* ---------- Flash Messages (Breeze) ---------- */
+.alert {
+  padding: 15px 20px;
+  margin: 20px 8%;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.alert-success { background: rgba(0,229,255,0.1); border: 1px solid var(--cyan); color: var(--cyan); }
+.alert-error   { background: rgba(255,47,209,0.1); border: 1px solid var(--pink); color: var(--pink); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .hero {
+    flex-direction: column;
+    padding-top: 100px;
+  }
+
+  .hero-text h1 {
+    font-size: 52px;
+  }
+
+  .hero-card {
+    width: 100%;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
