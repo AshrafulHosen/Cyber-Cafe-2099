@@ -1,27 +1,22 @@
 <nav>
-  <div class="logo">Cyber Café 2099</div>
-
-  <div class="nav-links">
-    <a href="{{ url('/#features') }}">Features</a>
-    <a href="{{ route('study.index') }}">Study Rooms</a>
-    <a href="{{ route('chat.index') }}">Chat</a>
-    <a href="{{ url('/#music') }}">Music</a>
-
+  <a href="{{ url('/') }}" class="nav-logo">CYBER<span>CAFÉ</span> 2099</a>
+  <ul class="nav-links">
+    <li><a href="{{ url('/cafe') }}">Café Room</a></li>
+    <li><a href="{{ route('study.index') }}">Study Tables</a></li>
+    <li><a href="{{ url('/music') }}">Music Lounge</a></li>
+    <li><a href="{{ url('/barista') }}">AI Barista</a></li>
+    <li><a href="{{ url('/profile') }}">Profile</a></li>
+  </ul>
+  <div class="nav-actions">
+    <div class="online-dot">2,847 online</div>
     @auth
-      {{-- Show username and logout when logged in --}}
-      <span style="color: var(--cyan); font-weight: 700;">{{ Auth::user()->name }}</span>
+      <span style="color: var(--cyan); font-weight: 700; margin-right: 10px; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;">{{ Auth::user()->name }}</span>
       <form method="POST" action="{{ route('logout') }}" style="display:inline;">
         @csrf
-        <button type="submit"
-          style="background:none; border:none; color:var(--soft);
-                 cursor:pointer; font-size:18px; font-family:'Rajdhani',sans-serif;">
-          Logout
-        </button>
+        <button type="submit" class="btn btn-cyan" style="padding:8px 18px;font-size:0.65rem">Logout</button>
       </form>
     @else
-      {{-- Show login/register when guest --}}
-      <a href="{{ route('login') }}">Login</a>
-      <a href="{{ route('register') }}">Register</a>
+      <a href="{{ route('login') }}" class="btn btn-cyan" style="padding:8px 18px;font-size:0.65rem">Enter</a>
     @endauth
   </div>
 </nav>

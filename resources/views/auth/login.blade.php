@@ -1,47 +1,94 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.app')
+
+@section('title', 'Login — Cyber Café 2099')
+
+@section('content')
+
+<section style="min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 0 8%;">
+
+  <div style="width: 100%; max-width: 480px;
+              background: rgba(15,20,40,0.65);
+              border: 1px solid rgba(255,255,255,0.08);
+              border-radius: 25px;
+              padding: 40px;
+              box-shadow: 0 0 40px rgba(0,229,255,0.15);
+              backdrop-filter: blur(20px);">
+
+    <h2 style="font-family:'Orbitron',sans-serif; color:#00e5ff;
+               text-align:center; margin-bottom:30px; font-size:28px;">
+      Login to Café
+    </h2>
+
+    {{-- Session Status --}}
+    @if (session('status'))
+      <div class="alert alert-success" style="margin-bottom:20px;">
+        {{ session('status') }}
+      </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
-        @csrf
+      @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+      {{-- Email --}}
+      <div style="margin-bottom: 20px;">
+        <label style="color:#9ab0c9; font-size:16px; display:block; margin-bottom:8px;">
+          Email
+        </label>
+        <input type="email" name="email" value="{{ old('email') }}" required autofocus
+          style="width:100%; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);
+                 background:rgba(255,255,255,0.08); color:white; font-size:16px;
+                 font-family:'Rajdhani',sans-serif; outline:none;">
+        @error('email')
+          <p style="color:#ff2fd1; margin-top:6px; font-size:14px;">{{ $message }}</p>
+        @enderror
+      </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+      {{-- Password --}}
+      <div style="margin-bottom: 20px;">
+        <label style="color:#9ab0c9; font-size:16px; display:block; margin-bottom:8px;">
+          Password
+        </label>
+        <input type="password" name="password" required
+          style="width:100%; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);
+                 background:rgba(255,255,255,0.08); color:white; font-size:16px;
+                 font-family:'Rajdhani',sans-serif; outline:none;">
+        @error('password')
+          <p style="color:#ff2fd1; margin-top:6px; font-size:14px;">{{ $message }}</p>
+        @enderror
+      </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+      {{-- Remember Me --}}
+      <div style="margin-bottom: 25px; display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" name="remember" id="remember"
+               style="width:16px; height:16px; accent-color:#00e5ff;">
+        <label for="remember" style="color:#9ab0c9; font-size:15px;">Remember me</label>
+      </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+      {{-- Submit --}}
+      <button type="submit"
+        style="width:100%; padding:15px; border-radius:12px; border:none; cursor:pointer;
+               background:linear-gradient(135deg,#00e5ff,#8c52ff); color:black;
+               font-size:18px; font-weight:700; font-family:'Rajdhani',sans-serif;
+               transition:0.3s;">
+        Enter the Café ☕
+      </button>
     </form>
-</x-guest-layout>
+
+    {{-- Links --}}
+    <div style="text-align:center; margin-top:25px;">
+      @if (Route::has('password.request'))
+        <a href="{{ route('password.request') }}"
+           style="color:#9ab0c9; font-size:15px; display:block; margin-bottom:10px; text-decoration:none;">
+          Forgot your password?
+        </a>
+      @endif
+      <a href="{{ route('register') }}"
+         style="color:#00e5ff; font-size:16px; text-decoration:none;">
+        No account? Register here
+      </a>
+    </div>
+
+  </div>
+</section>
+
+@endsection
