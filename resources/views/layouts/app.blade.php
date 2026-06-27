@@ -20,9 +20,6 @@
     <div class="pre-text" id="pre-text">INITIALIZING NEURAL LINK...</div>
   </div>
 
-  <!-- CURSOR -->
-  <div id="cursor"></div>
-  <div id="cursor-trail"></div>
   <div id="scanlines"></div>
   <div id="noise"></div>
 

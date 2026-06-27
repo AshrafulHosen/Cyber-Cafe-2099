@@ -1,18 +1,4 @@
 
-/* ── CURSOR ── */
-const cur = document.getElementById('cursor');
-const trail = document.getElementById('cursor-trail');
-let mx=window.innerWidth/2, my=window.innerHeight/2;
-document.addEventListener('mousemove', e => {
-  mx=e.clientX; my=e.clientY;
-  cur.style.left=mx+'px'; cur.style.top=my+'px';
-});
-let tx=mx,ty=my;
-(function animTrail(){
-  tx+=(mx-tx)*0.12; ty+=(my-ty)*0.12;
-  trail.style.left=tx+'px'; trail.style.top=ty+'px';
-  requestAnimationFrame(animTrail);
-})();
 
 /* ── PRELOADER ── */
 const preTexts = ['INITIALIZING NEURAL LINK...','LOADING TOKYO NODE...','CONNECTING TO SECTOR 7...','BREWING SYNTHWAVE...','CAFÉ IS READY'];
