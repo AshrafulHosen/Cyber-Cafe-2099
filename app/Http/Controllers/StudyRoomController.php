@@ -34,4 +34,17 @@ class StudyRoomController extends Controller
 
         return view('study', compact('tables'));
     }
-}
+
+    public function show($id)
+    {
+        // Mock data for a specific table
+        $table = [
+            'id' => $id,
+            'name' => 'Cyber Focus ' . $id,
+            'color' => 'blue', // Defaulting to studying (blue)
+            'activity' => 'studying',
+        ];
+
+        return view('study-room', compact('table'));
+    }
+}

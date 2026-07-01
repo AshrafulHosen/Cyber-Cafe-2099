@@ -14,11 +14,14 @@
 <body>
 
   <!-- PRELOADER -->
-  <div id="preloader">
-    <div class="pre-logo">CYBER CAFÉ 2099</div>
-    <div class="pre-bar"><div class="pre-fill"></div></div>
-    <div class="pre-text" id="pre-text">INITIALIZING NEURAL LINK...</div>
-  </div>
+  @if(!session()->has('preloader_shown'))
+    <div id="preloader">
+      <div class="pre-logo">CYBER CAFÉ 2099</div>
+      <div class="pre-bar"><div class="pre-fill"></div></div>
+      <div class="pre-text" id="pre-text">INITIALIZING NEURAL LINK...</div>
+    </div>
+    @php session()->put('preloader_shown', true); @endphp
+  @endif
 
   <div id="scanlines"></div>
   <div id="noise"></div>

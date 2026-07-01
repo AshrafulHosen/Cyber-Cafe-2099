@@ -1,14 +1,19 @@
 
 
 /* ── PRELOADER ── */
-const preTexts = ['INITIALIZING NEURAL LINK...','LOADING TOKYO NODE...','CONNECTING TO SECTOR 7...','BREWING SYNTHWAVE...','CAFÉ IS READY'];
-let pi=0;
-const preInterval = setInterval(()=>{
-  pi++; if(pi>=preTexts.length){ clearInterval(preInterval); return; }
-  document.getElementById('pre-text').textContent=preTexts[pi];
-},440);
-setTimeout(()=>{ document.getElementById('preloader').classList.add('done'); }, 2400);
-
+const preloaderEl = document.getElementById('preloader');
+if (preloaderEl) {
+  const preTexts = ['INITIALIZING NEURAL LINK...','LOADING TOKYO NODE...','CONNECTING TO SECTOR 7...','BREWING SYNTHWAVE...','CAFÉ IS READY'];
+  let pi=0;
+  const preInterval = setInterval(()=>{
+    pi++; if(pi>=preTexts.length){ clearInterval(preInterval); return; }
+    const el = document.getElementById('pre-text');
+    if (el) el.textContent=preTexts[pi];
+  },440);
+  setTimeout(()=>{ 
+    preloaderEl.classList.add('done'); 
+  }, 2400);
+}
 /* ── PARTICLES ── */
 const pf = document.getElementById('particle-field');
 if (pf) {
