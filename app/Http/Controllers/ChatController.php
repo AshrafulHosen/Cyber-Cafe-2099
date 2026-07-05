@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-// use App\Models\Message; // Uncomment in Phase 4 when DB is ready
+use App\Models\Message;
 
 class ChatController extends Controller
 {
@@ -20,9 +20,7 @@ class ChatController extends Controller
 
     public function index()
     {
-        // Static seed messages for now — replace with DB in Phase 4:
-        // $messages = Message::with('user')->latest()->take(30)->get()->reverse();
-        $messages = collect([]);  // empty collection, blade uses @forelse fallback
+        $messages = Message::with('user')->latest()->take(30)->get()->reverse();
 
         return view('chat', compact('messages'));
     }
@@ -33,12 +31,11 @@ class ChatController extends Controller
             'content' => 'required|string|max:500',
         ]);
 
-        // In Phase 4, save to DB:
-        // Message::create([
-        //     'user_id' => auth()->id(),
-        //     'content' => $request->content,
-        //     'room'    => 'global',
-        // ]);
+        Message::create([
+            'user_id' => auth()->id(),
+            'content' => $request->content,
+            'room'    => 'global',
+        ]);
 
         // Return a random AI Barista reply
         $aiReply = $this->baristaReplies[array_rand($this->baristaReplies)];

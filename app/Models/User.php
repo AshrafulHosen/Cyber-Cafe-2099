@@ -22,7 +22,25 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'cyber_credits',
+        'focus_hours',
+        'sessions_count'
     ];
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class)->latest();
+    }
+
+    public function inventoryItems()
+    {
+        return $this->belongsToMany(InventoryItem::class, 'user_inventories')->withPivot('status')->withTimestamps();
+    }
+
+    public function activeStudySession()
+    {
+        return $this->hasOne(StudySession::class)->where('active', true);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

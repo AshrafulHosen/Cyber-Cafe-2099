@@ -42,15 +42,15 @@
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                   <div style="padding: 20px; border: 1px solid rgba(0,255,255,0.2); background: rgba(0,255,255,0.02); border-radius: 8px;">
                       <div style="font-family: var(--font-mono); color: var(--cyan); font-size: 0.8rem; text-transform: uppercase;">Cyber Credits</div>
-                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ rand(1200, 5000) }} <span style="font-size:1rem; color:var(--text-dim)">¥</span></div>
+                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ Auth::user()->cyber_credits ?? 0 }} <span style="font-size:1rem; color:var(--text-dim)">¥</span></div>
                   </div>
                   <div style="padding: 20px; border: 1px solid rgba(255,0,255,0.2); background: rgba(255,0,255,0.02); border-radius: 8px;">
                       <div style="font-family: var(--font-mono); color: var(--pink); font-size: 0.8rem; text-transform: uppercase;">Focus Hours</div>
-                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ rand(12, 80) }}<span style="font-size:1rem; color:var(--text-dim)">h</span></div>
+                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ Auth::user()->focus_hours ?? 0 }}<span style="font-size:1rem; color:var(--text-dim)">h</span></div>
                   </div>
                   <div style="padding: 20px; border: 1px solid rgba(138,43,226,0.2); background: rgba(138,43,226,0.02); border-radius: 8px;">
                       <div style="font-family: var(--font-mono); color: var(--purple); font-size: 0.8rem; text-transform: uppercase;">Sessions</div>
-                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ rand(5, 40) }}</div>
+                      <div style="font-size: 2rem; color: var(--white); margin-top: 10px;">{{ Auth::user()->sessions_count ?? 0 }}</div>
                   </div>
               </div>
               
@@ -59,27 +59,17 @@
                   <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Digital Inventory</h4>
                   
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                      <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid var(--cyan);">
-                          <div style="font-size: 2rem;">🎧</div>
-                          <div>
-                              <div style="color: var(--white); font-size: 0.9rem;">Synthwave Audio Pack</div>
-                              <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">EQUIPPED</div>
+                      @forelse(Auth::user()->inventoryItems as $item)
+                          <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid {{ $item->pivot->status === 'EQUIPPED' ? 'var(--cyan)' : 'var(--purple)' }};">
+                              <div style="font-size: 2rem;">{{ $item->icon }}</div>
+                              <div>
+                                  <div style="color: var(--white); font-size: 0.9rem;">{{ $item->name }}</div>
+                                  <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">{{ $item->pivot->status }}</div>
+                              </div>
                           </div>
-                      </div>
-                      <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid var(--purple);">
-                          <div style="font-size: 2rem;">🐈</div>
-                          <div>
-                              <div style="color: var(--white); font-size: 0.9rem;">Cyber Cat Hologram</div>
-                              <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">IDLE</div>
-                          </div>
-                      </div>
-                      <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px dashed rgba(255,255,255,0.1); opacity: 0.5;">
-                          <div style="font-size: 2rem; filter: grayscale(1);">🌧️</div>
-                          <div>
-                              <div style="color: var(--white); font-size: 0.9rem;">Rain Ambience Room</div>
-                              <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">LOCKED (2000 ¥)</div>
-                          </div>
-                      </div>
+                      @empty
+                          <div style="color: var(--text-dim); font-style: italic;">No items in inventory.</div>
+                      @endforelse
                   </div>
               </div>
               
@@ -87,18 +77,21 @@
               <div style="padding: 30px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px;">
                   <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Recent Activity</h4>
                   <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px;">
-                      <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
-                          <div><span style="color: var(--cyan);">[STUDY]</span> Completed 25m Pomodoro at Node_04</div>
-                          <div style="color: var(--text-dim); font-family: var(--font-mono);">2 hours ago</div>
-                      </li>
-                      <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
-                          <div><span style="color: var(--purple);">[CHAT]</span> Joined Global Lounge</div>
-                          <div style="color: var(--text-dim); font-family: var(--font-mono);">Yesterday</div>
-                      </li>
-                      <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
-                          <div><span style="color: var(--pink);">[STORE]</span> Purchased Cyber Cat Hologram</div>
-                          <div style="color: var(--text-dim); font-family: var(--font-mono);">3 days ago</div>
-                      </li>
+                      @forelse(Auth::user()->activityLogs as $log)
+                          <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                              <div>
+                                  <span style="color: {{ $log->type === 'STUDY' ? 'var(--cyan)' : ($log->type === 'CHAT' ? 'var(--purple)' : 'var(--pink)') }};">
+                                      [{{ $log->type }}]
+                                  </span> 
+                                  {{ $log->message }}
+                              </div>
+                              <div style="color: var(--text-dim); font-family: var(--font-mono);">
+                                  {{ $log->created_at ? $log->created_at->diffForHumans() : 'Unknown time' }}
+                              </div>
+                          </li>
+                      @empty
+                          <li style="color: var(--text-dim); font-style: italic;">No recent activity found.</li>
+                      @endforelse
                   </ul>
               </div>
           </div>

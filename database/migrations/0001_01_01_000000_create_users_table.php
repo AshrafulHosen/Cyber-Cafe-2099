@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->integer('cyber_credits')->default(0);
+            $table->integer('focus_hours')->default(0);
+            $table->integer('sessions_count')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
