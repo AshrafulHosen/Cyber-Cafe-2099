@@ -9,7 +9,9 @@ class StudyRoomController extends Controller
 {
     public function index()
     {
-        $tables = StudyTable::withCount('activeSessions as user_count')->get();
+        $tables = StudyTable::select('id', 'name', 'color', 'activity')
+            ->withCount('activeSessions as user_count')
+            ->get();
 
         return view('study', compact('tables'));
     }

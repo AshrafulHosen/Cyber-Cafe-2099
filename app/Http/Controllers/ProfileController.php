@@ -12,6 +12,18 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
+     * Display the user's main profile dashboard.
+     */
+    public function show(Request $request): View
+    {
+        $user = $request->user()->load('inventoryItems');
+        // Paginate activity logs for the current user
+        $logs = $user->activityLogs()->paginate(5);
+
+        return view('profile', compact('user', 'logs'));
+    }
+
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View

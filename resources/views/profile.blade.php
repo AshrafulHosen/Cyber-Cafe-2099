@@ -59,7 +59,7 @@
                   <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Digital Inventory</h4>
                   
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                      @forelse(Auth::user()->inventoryItems as $item)
+                      @forelse($user->inventoryItems as $item)
                           <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid {{ $item->pivot->status === 'EQUIPPED' ? 'var(--cyan)' : 'var(--purple)' }};">
                               <div style="font-size: 2rem;">{{ $item->icon }}</div>
                               <div>
@@ -77,7 +77,7 @@
               <div style="padding: 30px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px;">
                   <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Recent Activity</h4>
                   <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px;">
-                      @forelse(Auth::user()->activityLogs as $log)
+                      @forelse($logs as $log)
                           <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                               <div>
                                   <span style="color: {{ $log->type === 'STUDY' ? 'var(--cyan)' : ($log->type === 'CHAT' ? 'var(--purple)' : 'var(--pink)') }};">
@@ -93,6 +93,9 @@
                           <li style="color: var(--text-dim); font-style: italic;">No recent activity found.</li>
                       @endforelse
                   </ul>
+                  <div style="margin-top: 20px;">
+                      {{ $logs->links() }}
+                  </div>
               </div>
           </div>
       </div>
