@@ -18,10 +18,10 @@
   <!-- Search Results Container -->
   <div id="yt-search-results" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin-left: auto; margin-right: auto; max-height: 250px; overflow-y: auto;"></div>
   
-  <div class="visualizer-wrap" style="margin-top: 50px; position: relative;">
-    <!-- Visible YouTube Player -->
-    <div style="width: 100%; aspect-ratio: 16/9; background: rgba(0,0,0,0.5); border: 1px solid rgba(138,43,226,0.5); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(138,43,226,0.2);">
-        <div id="yt-player" style="width: 100%; height: 100%;"></div>
+  <div class="visualizer-wrap" style="margin-top: 50px; position: relative; text-align: center;">
+    <!-- This is the anchor point where the global player will attach itself in full-mode -->
+    <div id="music-video-placeholder" style="width: 100%; aspect-ratio: 16/9; background: rgba(0,0,0,0.5); border: 1px solid rgba(138,43,226,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(138,43,226,0.2); margin-bottom: 20px;">
+        <h3 style="color: var(--cyan); font-family: var(--font-mono); font-size: 1.5rem; text-shadow: 0 0 10px var(--cyan);">[ SATELLITE AUDIO FEED ]</h3>
     </div>
     
     <div class="music-controls" style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
@@ -34,7 +34,7 @@
 
     <!-- Playback Controls -->
     <div style="margin-top: 20px; text-align: center; display: flex; gap: 15px; justify-content: center; align-items: center;">
-        <button id="yt-toggle" class="btn btn-purple" style="padding: 8px 20px; font-size: 0.9rem;" disabled>Connecting to Satellite...</button>
+        <button id="yt-toggle" class="btn btn-purple" style="padding: 8px 20px; font-size: 0.9rem;">Connecting to Satellite...</button>
         <div style="color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem;">
             VOL <input type="range" id="yt-volume" min="0" max="100" value="50" style="vertical-align: middle; width: 100px;">
         </div>
@@ -48,84 +48,71 @@
 </div>
 
 @push('scripts')
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-    var player;
-    var isPlaying = false;
-    var currentVid = null;
-
-    // Called automatically by YouTube Iframe API when loaded
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('yt-player', {
-            height: '100%',
-            width: '100%',
-            videoId: '', // start empty
-            playerVars: { 'autoplay': 1, 'controls': 1, 'disablekb': 1, 'fs': 0, 'playsinline': 1 },
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': onPlayerError
-            }
-        });
-    }
-
-    function onPlayerReady(event) {
-        player.setVolume(50);
-        document.getElementById('yt-toggle').innerText = 'PAUSED';
-        document.getElementById('yt-toggle').disabled = false;
-    }
-
-    function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING) {
-            isPlaying = true;
-            document.getElementById('yt-toggle').innerText = 'PAUSE';
-            document.getElementById('yt-status').innerText = '[STREAMING FROM SATELLITE: ACTIVE]';
-        } else if (event.data == YT.PlayerState.PAUSED) {
-            isPlaying = false;
-            document.getElementById('yt-toggle').innerText = 'PLAY';
-            document.getElementById('yt-status').innerText = '[STREAMING PAUSED]';
+    // Initialize UI based on global state
+    function syncMusicUI() {
+        if (!window.globalPlayer) return;
+        
+        const toggleBtn = document.getElementById('yt-toggle');
+        const statusText = document.getElementById('yt-status');
+        
+        toggleBtn.disabled = false;
+        
+        if (window.globalIsPlaying) {
+            toggleBtn.innerText = 'PAUSE';
+            statusText.innerText = '[STREAMING FROM SATELLITE: ACTIVE]';
+        } else {
+            toggleBtn.innerText = 'PLAY';
+            statusText.innerText = '[STREAMING PAUSED]';
         }
     }
 
-    function onPlayerError(event) {
+    // Force sync periodically to avoid race conditions with Swup and YouTube API loading times
+    let syncInterval = setInterval(() => {
+        if (window.globalPlayer && typeof window.globalPlayer.getPlayerState === 'function') {
+            syncMusicUI();
+            clearInterval(syncInterval);
+        }
+    }, 500);
+
+    // Listen for global events broadcasted from app.blade.php
+    document.addEventListener('GlobalPlayerReady', syncMusicUI);
+    document.addEventListener('GlobalPlayerStateChange', syncMusicUI);
+    document.addEventListener('GlobalPlayerError', function() {
         document.getElementById('yt-status').innerText = '[ERROR: FREQUENCY BLOCKED. TRY ANOTHER NODE]';
-    }
+        clearInterval(syncInterval);
+    });
 
     // Toggle Play/Pause Button
     document.getElementById('yt-toggle').addEventListener('click', function() {
-        if (!player || !currentVid) return;
-        if (isPlaying) {
-            player.pauseVideo();
+        if (!window.globalPlayer || !window.globalCurrentVid) return;
+        if (window.globalIsPlaying) {
+            window.globalPlayer.pauseVideo();
         } else {
-            player.playVideo();
+            window.globalPlayer.playVideo();
         }
     });
 
     // Volume Slider
     document.getElementById('yt-volume').addEventListener('input', function(e) {
-        if (player) {
-            player.setVolume(e.target.value);
+        if (window.globalPlayer) {
+            window.globalPlayer.setVolume(e.target.value);
         }
     });
 
     // Mode Buttons (Lofi, Synthwave, etc)
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            // UI Update handled mostly by app.js, but let's force it here too
             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
             var vid = this.getAttribute('data-vid');
-            if (vid !== currentVid) {
-                currentVid = vid;
+            if (vid !== window.globalCurrentVid) {
                 document.getElementById('yt-status').innerText = '[BUFFERING FREQUENCY...]';
-                if (player && typeof player.loadVideoById === 'function') {
-                    player.loadVideoById(vid);
-                }
+                window.playGlobalMusic(vid);
             } else {
-                // If clicking the same one, just make sure it's playing
-                if (!isPlaying && player) {
-                    player.playVideo();
+                if (!window.globalIsPlaying && window.globalPlayer) {
+                    window.globalPlayer.playVideo();
                 }
             }
         });
@@ -170,11 +157,8 @@
                         
                         resultDiv.addEventListener('click', () => {
                             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                            currentVid = vid;
                             document.getElementById('yt-status').innerText = `[BUFFERING: ${title}]`;
-                            if (player && typeof player.loadVideoById === 'function') {
-                                player.loadVideoById(vid);
-                            }
+                            window.playGlobalMusic(vid);
                         });
                         
                         resultsContainer.appendChild(resultDiv);

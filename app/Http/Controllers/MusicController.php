@@ -19,11 +19,10 @@ class MusicController extends Controller
         
         $response = Http::get('https://www.googleapis.com/youtube/v3/search', [
             'part' => 'snippet',
-            'q' => $query,
+            'q' => $query, // Removed append for better search results
             'type' => 'video',
-            'videoEmbeddable' => 'true', // Only return videos we can actually play!
-            'videoCategoryId' => '10', // Music category
-            'maxResults' => 8,
+            'videoEmbeddable' => 'true', 
+            'maxResults' => 15,
             'key' => $apiKey
         ]);
 
@@ -31,6 +30,9 @@ class MusicController extends Controller
             return response()->json($response->json());
         }
 
-        return response()->json(['error' => 'Failed to fetch from YouTube API'], 500);
+        $errorDetail = $response->json();
+        $message = $errorDetail['error']['message'] ?? 'Unknown YouTube API Error. Make sure your API key is valid and the YouTube Data API v3 service is enabled in Google Cloud Console.';
+
+        return response()->json(['error' => 'API Error: ' . $message], 400);
     }
 }
