@@ -14,15 +14,28 @@
     
     @foreach ($tables as $index => $table)
       @php
-        $hex = '#1a6aff'; // default blue
-        if ($table['color'] === 'purple') $hex = 'var(--purple)';
-        if ($table['color'] === 'red') $hex = 'var(--pink)';
+        $activity = strtolower($table['activity']);
+        
+        // Map activities to specific distinct styles
+        $theme = match($activity) {
+            'studying' => ['hex' => 'var(--cyan)', 'icon' => '📚', 'bg' => 'linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0,0,0,0.8) 100%)'],
+            'chatting' => ['hex' => 'var(--purple)', 'icon' => '💬', 'bg' => 'linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(0,0,0,0.8) 100%)'],
+            'coding' => ['hex' => '#00ffcc', 'icon' => '💻', 'bg' => 'linear-gradient(135deg, rgba(0, 255, 204, 0.1) 0%, rgba(0,0,0,0.8) 100%)'],
+            'gaming' => ['hex' => '#ff3366', 'icon' => '🎮', 'bg' => 'linear-gradient(135deg, rgba(255, 51, 102, 0.1) 0%, rgba(0,0,0,0.8) 100%)'],
+            'inactive' => ['hex' => 'var(--pink)', 'icon' => '💤', 'bg' => 'linear-gradient(135deg, rgba(255, 0, 128, 0.05) 0%, rgba(0,0,0,0.9) 100%)'],
+            default => ['hex' => '#1a6aff', 'icon' => '🌐', 'bg' => 'rgba(0,0,0,0.8)']
+        };
+        
+        $hex = $theme['hex'];
       @endphp
-      <div class="table-card {{ $table['color'] }}">
+      <div class="table-card" style="background: {{ $theme['bg'] }}; border: 1px solid {{ $hex }}; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
         <div class="tc-glow" style="background:{{ $hex }}"></div>
         <div class="tc-status"><div class="tc-dot" style="background:{{ $hex }};box-shadow:0 0 6px {{ $hex }}"></div><span style="color:{{ $hex }}">{{ strtoupper($table['activity']) }}</span></div>
-        <div class="tc-name">{{ $table['name'] }}</div>
-        <div class="tc-users">{{ $table['user_count'] }} users · {{ $table['activity'] }}</div>
+        <div class="tc-name" style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.2rem;">{{ $theme['icon'] }}</span> 
+            {{ $table['name'] }}
+        </div>
+        <div class="tc-users">{{ $table['user_count'] }} users · {{ ucfirst($table['activity']) }}</div>
         <div class="tc-bar"><div class="tc-bar-fill" style="width:{{ rand(40, 90) }}%;background:{{ $hex }}"></div></div>
         
         @auth

@@ -10,9 +10,10 @@ use App\Http\Controllers\MusicController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/study', [StudyRoomController::class, 'index'])->name('study.index');
+Route::get('/study/leave', [StudyRoomController::class, 'leave'])->name('study.leave');
 Route::get('/study/{id}', [StudyRoomController::class, 'show'])->name('study.show');
 
-Route::view('/cafe', 'cafe')->name('cafe');
+Route::get('/cafe', [ChatController::class, 'index'])->name('cafe.index');
 Route::view('/music', 'music')->name('music');
 Route::get('/music/search', [MusicController::class, 'searchMusic'])->name('music.search');
 Route::view('/barista', 'barista')->name('barista');
@@ -23,8 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    Route::post('/cafe', [ChatController::class, 'store'])->name('cafe.store');
 });
 
 require __DIR__.'/auth.php';

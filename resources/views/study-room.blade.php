@@ -94,7 +94,7 @@
         
         <div>
             <button id="focusToggle" class="btn btn-purple">◈ Enable Focus Mode</button>
-            <a href="{{ route('study.index') }}" class="btn btn-solid" style="margin-left: 10px;">Leave Table</a>
+            <a href="{{ route('study.leave') }}" class="btn btn-solid" style="margin-left: 10px;">Leave Table</a>
         </div>
     </div>
 
@@ -171,44 +171,38 @@
 
 @push('scripts')
 <script>
-    // Pomodoro Timer Logic
-    let timerInterval;
-    let secondsLeft = 25 * 60;
-    let isRunning = false;
-    
-    const display = document.getElementById('timer');
-    
+(function() {
+    // Sync with Global Pomodoro Timer
     function updateDisplay() {
-        let m = Math.floor(secondsLeft / 60);
-        let s = secondsLeft % 60;
+        const display = document.getElementById('timer');
+        if (!display) return;
+        let m = Math.floor(window.globalSecondsLeft / 60);
+        let s = window.globalSecondsLeft % 60;
         display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
     
+    // Initial sync on page load
+    updateDisplay();
+    
+    // Listen for ticks broadcasted from the global timer
+    document.addEventListener('GlobalTimerTick', updateDisplay);
+    
+    // Sync buttons to global functions
     document.getElementById('startTimer').addEventListener('click', () => {
-        if (isRunning) return;
-        isRunning = true;
-        timerInterval = setInterval(() => {
-            if (secondsLeft > 0) {
-                secondsLeft--;
-                updateDisplay();
-            } else {
-                clearInterval(timerInterval);
-                isRunning = false;
-                alert("Session complete! Time for a neon break.");
-            }
-        }, 1000);
+        if (window.startGlobalTimer) window.startGlobalTimer();
     });
     
     document.getElementById('pauseTimer').addEventListener('click', () => {
-        clearInterval(timerInterval);
-        isRunning = false;
+        if (window.pauseGlobalTimer) window.pauseGlobalTimer();
     });
     
     document.getElementById('resetTimer').addEventListener('click', () => {
-        clearInterval(timerInterval);
-        isRunning = false;
-        secondsLeft = 25 * 60;
-        updateDisplay();
+        if (window.resetGlobalTimer) window.resetGlobalTimer();
+    });
+
+    // Cleanup listeners if Swup navigates away (to prevent duplicate listeners on return)
+    window.swup.hooks.once('page:view', () => {
+        document.removeEventListener('GlobalTimerTick', updateDisplay);
     });
 
     // Focus Mode Toggle
@@ -227,6 +221,7 @@
             document.getElementById('room-glow').style.opacity = '0.15';
         }
     });
+})();
 </script>
 @endpush
 @endsection

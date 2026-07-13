@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  @stack('styles')
   <style>
     /* Swup Transition Styles */
     .transition-fade {
@@ -71,7 +70,13 @@
   </div>
 
   <main id="swup" class="transition-fade">
+    @stack('styles')
     @yield('content')
+    
+    <!-- Page Specific Scripts that reload on Swup -->
+    <div id="swup-scripts" style="display: none;">
+      @stack('scripts')
+    </div>
   </main>
 
   @include('partials.footer')
@@ -117,6 +122,40 @@
             document.getElementById('global-player-wrapper').style.display = 'block';
             window.updatePiPState();
         }
+    };
+
+    // Global Pomodoro Timer Logic
+    window.globalSecondsLeft = 25 * 60;
+    window.globalTimerRunning = false;
+    window.globalTimerInterval = null;
+
+    window.startGlobalTimer = function() {
+        if (window.globalTimerRunning) return;
+        window.globalTimerRunning = true;
+        window.globalTimerInterval = setInterval(() => {
+            if (window.globalSecondsLeft > 0) {
+                window.globalSecondsLeft--;
+                document.dispatchEvent(new Event('GlobalTimerTick'));
+            } else {
+                clearInterval(window.globalTimerInterval);
+                window.globalTimerRunning = false;
+                document.dispatchEvent(new Event('GlobalTimerComplete'));
+                alert("Session complete! Time for a neon break.");
+            }
+        }, 1000);
+    };
+
+    window.pauseGlobalTimer = function() {
+        clearInterval(window.globalTimerInterval);
+        window.globalTimerRunning = false;
+        document.dispatchEvent(new Event('GlobalTimerTick'));
+    };
+
+    window.resetGlobalTimer = function() {
+        clearInterval(window.globalTimerInterval);
+        window.globalTimerRunning = false;
+        window.globalSecondsLeft = 25 * 60;
+        document.dispatchEvent(new Event('GlobalTimerTick'));
     };
 
     // PiP State Management
@@ -168,7 +207,9 @@
     // Initialize SPA Router safely
     try {
         if (typeof Swup !== 'undefined') {
-            window.swup = new Swup();
+            window.swup = new Swup({
+                cache: false // Disable cache so server redirects (like session seat tracking) always work
+            });
             
             // Handle Swup page transitions
             window.swup.hooks.on('page:view', () => {
@@ -189,10 +230,5 @@
         console.error("Swup initialization error:", e);
     }
   </script>
-
-  <!-- Page Specific Scripts that reload on Swup -->
-  <div id="swup-scripts">
-    @stack('scripts')
-  </div>
 </body>
 </html>
