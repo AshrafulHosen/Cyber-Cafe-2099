@@ -47,6 +47,22 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="bio" :value="__('Bio / Status')" />
+            <textarea id="bio" name="bio" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" rows="3">{{ old('bio', $user->bio) }}</textarea>
+            <x-input-error class="mt-2" :messages="$errors->get('bio')" />
+        </div>
+
+        <div>
+            <x-input-label for="theme_color" :value="__('Theme Color')" />
+            <select id="theme_color" name="theme_color" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
+                <option value="cyan" {{ old('theme_color', $user->theme_color) == 'cyan' ? 'selected' : '' }}>Cyan</option>
+                <option value="pink" {{ old('theme_color', $user->theme_color) == 'pink' ? 'selected' : '' }}>Pink</option>
+                <option value="purple" {{ old('theme_color', $user->theme_color) == 'purple' ? 'selected' : '' }}>Purple</option>
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('theme_color')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

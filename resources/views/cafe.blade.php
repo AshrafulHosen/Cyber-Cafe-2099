@@ -116,7 +116,11 @@
                   $isSelf = Auth::check() && Auth::id() === $message->user_id;
               @endphp
               <div class="chat-msg {{ $isSelf ? 'self' : 'other' }}">
-                  <div class="msg-author">{{ $message->user->name ?? 'Unknown' }}</div>
+                  <div class="msg-author">
+                      <a href="{{ route('profile.public', $message->user_id) }}" style="color: inherit; text-decoration: none; border-bottom: 1px dashed transparent; transition: border-color 0.3s;" onmouseover="this.style.borderBottomColor='currentColor'" onmouseout="this.style.borderBottomColor='transparent'">
+                          {{ $message->user->name ?? 'Unknown' }}
+                      </a>
+                  </div>
                   <div class="msg-bubble">{{ $message->content }}</div>
               </div>
           @empty

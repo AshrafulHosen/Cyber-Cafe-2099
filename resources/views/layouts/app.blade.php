@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'CYBER CAFÉ 2099 — Where Neon Meets Silence')</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -46,6 +47,26 @@
       z-index: 40;
     }
   </style>
+
+  @auth
+    @if(Auth::user()->theme_color === 'pink')
+      <style>
+        :root {
+          --cyan: #ff2d78;
+          --cyan-dim: #b01e53;
+          --glow-c: 0 0 20px rgba(255,45,120,0.5), 0 0 60px rgba(255,45,120,0.2);
+        }
+      </style>
+    @elseif(Auth::user()->theme_color === 'purple')
+      <style>
+        :root {
+          --cyan: #b44fff;
+          --cyan-dim: #7a2eb8;
+          --glow-c: 0 0 20px rgba(180,79,255,0.5), 0 0 60px rgba(180,79,255,0.2);
+        }
+      </style>
+    @endif
+  @endauth
 </head>
 <body>
 

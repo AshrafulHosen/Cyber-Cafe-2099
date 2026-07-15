@@ -93,6 +93,13 @@
         </div>
         
         <div>
+            @if(Auth::check() && $table->user_id === Auth::id())
+                <form action="{{ route('study.destroy', $table->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-pink" style="margin-right: 10px;" onclick="return confirm('Are you sure you want to permanently disband this table?')">[ DISBAND TABLE ]</button>
+                </form>
+            @endif
             <button id="focusToggle" class="btn btn-purple">◈ Enable Focus Mode</button>
             <a href="{{ route('study.leave') }}" class="btn btn-solid" style="margin-left: 10px;">Leave Table</a>
         </div>

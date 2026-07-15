@@ -18,6 +18,20 @@
   <!-- Search Results Container -->
   <div id="yt-search-results" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin-left: auto; margin-right: auto; max-height: 250px; overflow-y: auto;"></div>
   
+  @auth
+  <!-- Personal Mixtapes -->
+  <div style="margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto; background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid var(--purple); border-radius: 8px;">
+      <h3 style="color: var(--pink); font-family: var(--font-mono); font-size: 1.1rem; border-bottom: 1px dashed rgba(255,45,120,0.5); padding-bottom: 10px; margin-bottom: 15px;">// MY MIXTAPES</h3>
+      <div id="mixtapes-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
+          <div style="color: var(--text-dim); font-size: 0.85rem; font-style: italic;">Loading mixtapes...</div>
+      </div>
+  </div>
+  @else
+  <div style="margin-top: 40px; text-align: center; font-family: var(--font-mono); color: var(--text-dim); font-size: 0.85rem;">
+      <a href="{{ route('login') }}" style="color: var(--purple);">Login</a> to save your favorite tracks to a Personal Mixtape.
+  </div>
+  @endauth
+  
   <div class="visualizer-wrap" style="margin-top: 50px; position: relative; text-align: center;">
     <!-- This is the anchor point where the global player will attach itself in full-mode -->
     <div id="music-video-placeholder" style="width: 100%; aspect-ratio: 16/9; background: rgba(0,0,0,0.5); border: 1px solid rgba(138,43,226,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(138,43,226,0.2); margin-bottom: 20px;">
@@ -143,23 +157,48 @@
                         const thumb = item.snippet.thumbnails.default.url;
                         
                         const resultDiv = document.createElement('div');
-                        resultDiv.style.cssText = 'display: flex; gap: 15px; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; cursor: pointer; border-left: 3px solid var(--purple); transition: 0.3s;';
+                        resultDiv.style.cssText = 'display: flex; gap: 15px; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; border-left: 3px solid var(--cyan); transition: 0.3s;';
+                        
                         resultDiv.innerHTML = `
-                            <img src="${thumb}" alt="thumbnail" style="width: 120px; border-radius: 4px;">
-                            <div style="text-align: left;">
-                                <div style="color: var(--white); font-weight: bold; font-size: 0.9rem;">${title}</div>
-                                <div style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono); margin-top: 5px;">${channel}</div>
+                            <div style="display: flex; gap: 15px; align-items: center; flex: 1; cursor: pointer;" class="search-item-clickable">
+                                <img src="${thumb}" alt="thumbnail" style="width: 100px; border-radius: 4px;">
+                                <div style="text-align: left;">
+                                    <div style="color: var(--white); font-weight: bold; font-size: 0.9rem;">${title}</div>
+                                    <div style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono); margin-top: 5px;">${channel}</div>
+                                </div>
                             </div>
+                            @auth
+                            <button class="btn btn-purple save-mixtape-btn" style="padding: 6px 12px; font-size: 0.7rem; flex-shrink: 0;" data-vid="${vid}" data-title="${title.replace(/"/g, '&quot;')}" data-channel="${channel.replace(/"/g, '&quot;')}" data-thumb="${thumb}">💾 SAVE</button>
+                            @endauth
                         `;
                         
                         resultDiv.addEventListener('mouseenter', () => resultDiv.style.background = 'rgba(255,255,255,0.1)');
                         resultDiv.addEventListener('mouseleave', () => resultDiv.style.background = 'rgba(255,255,255,0.05)');
                         
-                        resultDiv.addEventListener('click', () => {
+                        // Play functionality
+                        resultDiv.querySelector('.search-item-clickable').addEventListener('click', () => {
                             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                             document.getElementById('yt-status').innerText = `[BUFFERING: ${title}]`;
                             window.playGlobalMusic(vid);
                         });
+                        
+                        // Save functionality
+                        @auth
+                        resultDiv.querySelector('.save-mixtape-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const btn = e.target;
+                            btn.innerText = 'SAVING...';
+                            btn.disabled = true;
+                            saveToMixtape({
+                                video_id: btn.getAttribute('data-vid'),
+                                title: btn.getAttribute('data-title'),
+                                channel_title: btn.getAttribute('data-channel'),
+                                thumbnail_url: btn.getAttribute('data-thumb')
+                            }).then(() => {
+                                btn.innerText = 'SAVED';
+                            });
+                        });
+                        @endauth
                         
                         resultsContainer.appendChild(resultDiv);
                     });
@@ -171,6 +210,84 @@
                 resultsContainer.innerHTML = '<div style="color: var(--pink); font-family: var(--font-mono);">[Connection error. Ensure API Key is configured in .env]</div>';
             });
     });
+
+    @auth
+    // Mixtape API Logic
+    function loadMixtapes() {
+        const container = document.getElementById('mixtapes-container');
+        if (!container) return;
+        
+        fetch('/music/mixtapes')
+            .then(res => res.json())
+            .then(data => {
+                container.innerHTML = '';
+                if (data.length === 0) {
+                    container.innerHTML = '<div style="color: var(--text-dim); font-size: 0.85rem; font-style: italic; text-align: center; padding: 10px;">Your mixtape is empty. Search above and save some tracks.</div>';
+                    return;
+                }
+                
+                data.forEach(item => {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'display: flex; gap: 15px; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 4px; border-left: 3px solid var(--pink);';
+                    
+                    row.innerHTML = `
+                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; cursor: pointer;" class="mix-item-clickable">
+                            <img src="${item.thumbnail_url}" alt="thumb" style="width: 60px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+                            <div>
+                                <div style="color: var(--white); font-weight: bold; font-size: 0.85rem;">${item.title}</div>
+                                <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">${item.channel_title}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-pink delete-mixtape-btn" style="padding: 4px 10px; font-size: 0.8rem; flex-shrink: 0;" data-id="${item.id}">✕</button>
+                    `;
+                    
+                    // Play
+                    row.querySelector('.mix-item-clickable').addEventListener('click', () => {
+                        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                        document.getElementById('yt-status').innerText = `[BUFFERING: ${item.title}]`;
+                        window.playGlobalMusic(item.video_id);
+                    });
+                    
+                    // Delete
+                    row.querySelector('.delete-mixtape-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm('Delete this track from your mixtape?')) {
+                            deleteMixtape(item.id);
+                        }
+                    });
+                    
+                    container.appendChild(row);
+                });
+            });
+    }
+
+    async function saveToMixtape(data) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        await fetch('/music/mixtapes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+        loadMixtapes();
+    }
+
+    async function deleteMixtape(id) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        await fetch(`/music/mixtapes/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        });
+        loadMixtapes();
+    }
+    
+    // Initial load
+    loadMixtapes();
+    @endauth
 </script>
 @endpush
 @endsection

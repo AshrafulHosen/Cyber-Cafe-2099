@@ -17,11 +17,17 @@
           <!-- LEFT COL: IDENTITY -->
           <div>
               <div style="padding: 40px; border: 1px solid var(--purple); background: rgba(138, 43, 226, 0.05); border-radius: 8px; text-align: center;">
-                  <div style="width: 120px; height: 120px; background: var(--dark-accent); border: 2px solid var(--purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--purple); margin: 0 auto 20px; box-shadow: 0 0 20px rgba(138,43,226,0.3);">
+                  <div style="width: 120px; height: 120px; background: var(--dark-accent); border: 2px solid var(--{{ Auth::user()->theme_color ?? 'purple' }}); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--{{ Auth::user()->theme_color ?? 'purple' }}); margin: 0 auto 20px; box-shadow: 0 0 20px var(--{{ Auth::user()->theme_color ?? 'purple' }}); opacity: 0.8;">
                       {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                   </div>
                   <h3 style="color: var(--white); font-size: 1.5rem; margin: 0;">{{ Auth::user()->name }}</h3>
                   <div style="color: var(--cyan); font-family: var(--font-mono); font-size: 0.85rem; margin-top: 5px;">{{ Auth::user()->email }}</div>
+                  
+                  @if(Auth::user()->bio)
+                  <div style="margin-top: 15px; padding: 10px; border-left: 2px solid var(--{{ Auth::user()->theme_color ?? 'cyan' }}); background: rgba(255,255,255,0.02); text-align: left; font-size: 0.9rem; font-style: italic; color: var(--text-dim);">
+                      "{{ Auth::user()->bio }}"
+                  </div>
+                  @endif
                   
                   <div style="margin-top: 30px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
                       <div style="color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px;">Neural Link Status</div>
@@ -31,7 +37,7 @@
                       </div>
                   </div>
                   
-                  <a href="{{ route('profile.edit') }}" class="btn btn-purple" style="margin-top: 30px; width: 100%; justify-content: center;">System Settings</a>
+                  <a href="{{ route('profile.edit') }}" class="btn btn-purple" style="margin-top: 30px; width: 100%; justify-content: center;">Profile Settings</a>
               </div>
           </div>
           

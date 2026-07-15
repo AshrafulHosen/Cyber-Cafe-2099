@@ -24,6 +24,17 @@ class ProfileController extends Controller
     }
 
     /**
+     * Display a user's public profile (Dossier).
+     */
+    public function showPublic($id): View
+    {
+        $user = \App\Models\User::with('inventoryItems')->findOrFail($id);
+        $logs = $user->activityLogs()->take(5)->get();
+
+        return view('profile.public', compact('user', 'logs'));
+    }
+
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View

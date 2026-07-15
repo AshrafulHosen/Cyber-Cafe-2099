@@ -35,4 +35,37 @@ class MusicController extends Controller
 
         return response()->json(['error' => 'API Error: ' . $message], 400);
     }
+
+    public function getMixtapes(Request $request)
+    {
+        return response()->json($request->user()->mixtapes);
+    }
+
+    public function saveMixtape(Request $request)
+    {
+        $request->validate([
+            'video_id' => 'required|string',
+            'title' => 'required|string',
+            'channel_title' => 'nullable|string',
+            'thumbnail_url' => 'nullable|string',
+        ]);
+
+        // Prevent duplicate saves for the same video_id
+        $exists = $request->user()->mixtapes()->where('video_id', $request->video_id)->exists();
+        if ($exists) {
+            return response()->json(['message' => 'Already saved to mixtape'], 200);
+        }
+
+        $mixtape = $request->user()->mixtapes()->create($request->only('video_id', 'title', 'channel_title', 'thumbnail_url'));
+
+        return response()->json(['message' => 'Saved to mixtape', 'mixtape' => $mixtape]);
+    }
+
+    public function deleteMixtape(Request $request, $id)
+    {
+        $mixtape = $request->user()->mixtapes()->findOrFail($id);
+        $mixtape->delete();
+
+        return response()->json(['message' => 'Removed from mixtape']);
+    }
 }

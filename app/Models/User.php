@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'bio',
+        'theme_color',
         'cyber_credits',
         'focus_hours',
         'sessions_count'
@@ -40,6 +42,11 @@ class User extends Authenticatable
     public function activeStudySession()
     {
         return $this->hasOne(StudySession::class)->where('active', true);
+    }
+
+    public function mixtapes()
+    {
+        return $this->hasMany(Mixtape::class)->latest();
     }
 
     /**
