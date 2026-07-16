@@ -180,8 +180,17 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             input.value = '';
 
+            let typingDiv = null;
+            if (text.toLowerCase().includes('@barista') || text.toLowerCase().includes('@nexus7')) {
+                typingDiv = document.createElement('div');
+                typingDiv.className = 'chat-msg other';
+                typingDiv.innerHTML = `<div class="msg-author" style="color:var(--pink)">Nexus-7</div><div class="msg-bubble" style="font-style: italic; color:var(--text-dim);">[Processing neural response...]</div>`;
+                messagesDiv.appendChild(typingDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
             try {
-                await fetch("{{ route('cafe.store') }}", {
+                const response = await fetch("{{ route('cafe.store') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -190,8 +199,30 @@
                     },
                     body: JSON.stringify({ content: text })
                 });
+
+                const data = await response.json();
+                
+                if (typingDiv) {
+                    typingDiv.remove();
+                }
+
+                if (data.ai_reply) {
+                    const aiDiv = document.createElement('div');
+                    aiDiv.className = 'chat-msg other';
+                    aiDiv.innerHTML = `
+                        <div class="msg-author" style="color:var(--pink)">
+                            <a href="/dossier/${data.ai_reply.user_id}" style="color: inherit; text-decoration: none; border-bottom: 1px dashed transparent; transition: border-color 0.3s;" onmouseover="this.style.borderBottomColor='currentColor'" onmouseout="this.style.borderBottomColor='transparent'">
+                                ${data.ai_reply.user.name}
+                            </a>
+                        </div>
+                        <div class="msg-bubble">${data.ai_reply.content}</div>
+                    `;
+                    messagesDiv.appendChild(aiDiv);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
             } catch (err) {
                 console.error('Chat error:', err);
+                if (typingDiv) typingDiv.remove();
             }
         };
 
