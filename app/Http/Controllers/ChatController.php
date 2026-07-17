@@ -9,25 +9,41 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $messages = Message::with('user')->latest()->take(30)->get()->reverse();
+        $messages = Message::with('user')->where('room', 'global')->latest()->take(30)->get()->reverse();
 
         return view('cafe', compact('messages'));
+    }
+
+    public function barista()
+    {
+        $room = 'barista_' . auth()->id();
+        $messages = Message::with('user')->where('room', $room)->oldest()->get();
+
+        return view('barista', compact('messages'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'content' => 'required|string|max:500',
+            'room'    => 'nullable|string|max:50',
         ]);
+
+        $room = $request->room ?: 'global';
 
         Message::create([
             'user_id' => auth()->id(),
             'content' => $request->content,
-            'room'    => 'global',
+            'room'    => $room,
         ]);
 
         $aiReply = null;
-        if (\Illuminate\Support\Str::contains(strtolower($request->content), ['@barista', '@nexus7'])) {
+        
+        // Trigger AI if mentioned in global chat OR if we're in the private barista room
+        $isMention = \Illuminate\Support\Str::contains(strtolower($request->content), ['@barista', '@nexus7']);
+        $isBaristaRoom = \Illuminate\Support\Str::startsWith($room, 'barista_');
+        
+        if ($isMention || $isBaristaRoom) {
             $apiKey = config('services.gemini.key');
             if ($apiKey) {
                 $barista = \App\Models\User::firstOrCreate(
@@ -45,7 +61,7 @@ class ChatController extends Controller
                         'contents' => [
                             [
                                 'parts' => [
-                                    ['text' => "You are Nexus-7, a snarky cyberpunk barista AI in a futuristic cafe called Cyber Cafe 2099. A user said: " . $request->content . " Respond briefly (max 2 sentences) in character."]
+                                    ['text' => "You are Nexus-7, a helpful and intelligent AI assistant in Cyber Cafe 2099. A user said: " . $request->content . " Respond helpfully and clearly, but keep your response very brief (1-2 sentences maximum)."]
                                 ]
                             ]
                         ]
@@ -57,7 +73,7 @@ class ChatController extends Controller
                             $aiReply = Message::create([
                                 'user_id' => $barista->id,
                                 'content' => $reply,
-                                'room'    => 'global',
+                                'room'    => $room,
                             ]);
                             $aiReply->load('user');
                         }

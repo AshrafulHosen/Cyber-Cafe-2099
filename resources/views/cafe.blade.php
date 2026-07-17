@@ -105,7 +105,7 @@
 @section('content')
 <div class="full-section">
 <section style="padding-top: 130px; max-width: 900px; margin: 0 auto;">
-  <div class="section-label">// public_lounge</div>
+  <div class="section-label">PUBLIC_LOUNGE</div>
   <h2 class="section-title">Café <span style="color:var(--pink)">Room</span></h2>
   <p class="section-sub">The global hub. Connect with other travelers currently roaming the neon city.</p>
   
@@ -199,6 +199,12 @@
                     },
                     body: JSON.stringify({ content: text })
                 });
+
+                if (response.status === 429) {
+                    if (typingDiv) typingDiv.remove();
+                    alert("RATE LIMIT EXCEEDED: Please slow down your messages.");
+                    return;
+                }
 
                 const data = await response.json();
                 

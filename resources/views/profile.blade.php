@@ -5,7 +5,7 @@
 @section('content')
 <div class="full-section">
 <section style="padding-top: 150px; max-width: 800px; margin: 0 auto;">
-  <div class="section-label">// user_profile.sys</div>
+  <div class="section-label">user_profile.sys</div>
   <h2 class="section-title">Digital <span style="color:var(--purple)">Identity</span></h2>
   <p class="section-sub">Manage your neural link settings and digital footprint.</p>
 
@@ -62,15 +62,15 @@
               
               <!-- INVENTORY -->
               <div style="padding: 30px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px;">
-                  <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Digital Inventory</h4>
+                  <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">Digital Inventory</h4>
                   
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                       @forelse($user->inventoryItems as $item)
-                          <div style="display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid {{ $item->pivot->status === 'EQUIPPED' ? 'var(--cyan)' : 'var(--purple)' }};">
+                          <div class="inventory-item-card" data-id="{{ $item->id }}" style="cursor: pointer; display: flex; gap: 15px; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 3px solid {{ $item->pivot->status === 'EQUIPPED' ? 'var(--cyan)' : 'var(--purple)' }}; transition: 0.2s;">
                               <div style="font-size: 2rem;">{{ $item->icon }}</div>
                               <div>
                                   <div style="color: var(--white); font-size: 0.9rem;">{{ $item->name }}</div>
-                                  <div style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">{{ $item->pivot->status }}</div>
+                                  <div class="item-status-text" style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">{{ $item->pivot->status }}</div>
                               </div>
                           </div>
                       @empty
@@ -81,7 +81,7 @@
               
               <!-- RECENT ACTIVITY -->
               <div style="padding: 30px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px;">
-                  <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">// Recent Activity</h4>
+                  <h4 style="color: var(--white); margin-bottom: 20px; font-family: var(--font-mono); border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">Recent Activity</h4>
                   <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px;">
                       @forelse($logs as $log)
                           <li style="display: flex; justify-content: space-between; font-size: 0.85rem;">
@@ -120,4 +120,67 @@
   </div>
 </section>
 </div>
+
+@push('styles')
+<style>
+  .inventory-item-card:hover {
+      background: rgba(255,255,255,0.05) !important;
+      transform: translateX(5px);
+  }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.inventory-item-card').forEach(card => {
+        card.addEventListener('click', async function() {
+            const itemId = this.getAttribute('data-id');
+            const statusText = this.querySelector('.item-status-text');
+            const originalColor = this.style.borderLeftColor;
+            
+            // Optimistic update
+            this.style.borderLeftColor = 'var(--text-dim)';
+            statusText.innerText = 'PROCESSING...';
+            
+            try {
+                const response = await fetch("{{ route('inventory.toggle') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({ item_id: itemId })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.new_status === 'EQUIPPED') {
+                        this.style.borderLeftColor = 'var(--cyan)';
+                        statusText.innerText = 'EQUIPPED';
+                        
+                        // If it's a room, we might have unequipped other rooms in backend. Refresh to be safe, or just let user refresh.
+                        // We'll just reload the page for simplicity to sync all states and global effects
+                        setTimeout(() => window.location.reload(), 300);
+                    } else {
+                        this.style.borderLeftColor = 'var(--purple)';
+                        statusText.innerText = 'STORED';
+                        setTimeout(() => window.location.reload(), 300);
+                    }
+                } else {
+                    alert(data.message || 'Failed to toggle item.');
+                    this.style.borderLeftColor = originalColor;
+                    statusText.innerText = originalColor === 'var(--cyan)' ? 'EQUIPPED' : 'STORED';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error.');
+                this.style.borderLeftColor = originalColor;
+                statusText.innerText = originalColor === 'var(--cyan)' ? 'EQUIPPED' : 'STORED';
+            }
+        });
+    });
+</script>
+@endpush
 @endsection

@@ -26,7 +26,9 @@ class User extends Authenticatable
         'theme_color',
         'cyber_credits',
         'focus_hours',
-        'sessions_count'
+        'sessions_count',
+        'is_admin',
+        'is_banned'
     ];
 
     public function activityLogs()
@@ -68,6 +70,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_seen_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

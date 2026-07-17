@@ -66,6 +66,17 @@
         }
       </style>
     @endif
+    @endauth
+  </style>
+
+  @auth
+    @php
+      $activeItems = Auth::user()->inventoryItems()->wherePivot('status', 'EQUIPPED')->pluck('name')->toArray();
+    @endphp
+  @else
+    @php
+      $activeItems = [];
+    @endphp
   @endauth
 </head>
 <body>
@@ -82,6 +93,32 @@
 
   <div id="scanlines"></div>
   <div id="noise"></div>
+
+  @if(in_array('Rain Ambience Room', $activeItems))
+    <div id="rain-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9000; background: url('data:image/svg+xml;utf8,<svg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><line x1=\'10\' y1=\'0\' x2=\'5\' y2=\'20\' stroke=\'rgba(0, 255, 255, 0.4)\' stroke-width=\'1\'/><line x1=\'50\' y1=\'5\' x2=\'45\' y2=\'30\' stroke=\'rgba(0, 255, 255, 0.4)\' stroke-width=\'1\'/><line x1=\'150\' y1=\'15\' x2=\'140\' y2=\'40\' stroke=\'rgba(0, 255, 255, 0.4)\' stroke-width=\'1\'/></svg>') repeat; opacity: 0.3; animation: rain 0.3s linear infinite;"></div>
+    <style>
+      @keyframes rain {
+        from { background-position: 0 0; }
+        to { background-position: -20px 100px; }
+      }
+    </style>
+  @endif
+
+  @if(in_array('Cyber Cat Hologram', $activeItems))
+    <div id="cyber-cat-hologram" style="position: fixed; bottom: 20px; left: 20px; font-size: 3rem; z-index: 9999; animation: float 3s ease-in-out infinite, pulse-glow 2s infinite alternate; filter: drop-shadow(0 0 10px var(--cyan)); pointer-events: none;">
+      🐈
+    </div>
+    <style>
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+      }
+      @keyframes pulse-glow {
+        from { opacity: 0.6; }
+        to { opacity: 1; filter: drop-shadow(0 0 20px var(--pink)); }
+      }
+    </style>
+  @endif
 
   @include('partials.navbar')
 
@@ -111,10 +148,13 @@
     window.globalCurrentVid = null;
 
     function onYouTubeIframeAPIReady() {
+        @php
+           $defaultVideo = in_array('Synthwave Audio Pack', $activeItems) ? 'MV_3Dpw-BRY' : 'jfKfPfyJRdk';
+        @endphp
         window.globalPlayer = new YT.Player('global-yt-player', {
             height: '100%',
             width: '100%',
-            videoId: 'jfKfPfyJRdk', // Provide valid initial video to prevent silent crash
+            videoId: '{{ $defaultVideo }}', // Provide valid initial video to prevent silent crash
             playerVars: { 'autoplay': 0, 'controls': 1, 'disablekb': 1, 'fs': 0, 'playsinline': 1 },
             events: {
                 'onReady': (e) => {

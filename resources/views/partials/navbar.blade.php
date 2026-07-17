@@ -5,11 +5,15 @@
     <li><a href="{{ route('study.index') }}">Study Tables</a></li>
     <li><a href="{{ url('/music') }}">Music Lounge</a></li>
     <li><a href="{{ url('/barista') }}">AI Barista</a></li>
+    <li><a href="{{ route('store.index') }}">Store</a></li>
     <li><a href="{{ url('/profile') }}">Profile</a></li>
   </ul>
   <div class="nav-actions">
-    <div class="online-dot">2,847 online</div>
+    <div class="online-dot">{{ \App\Models\User::where('last_seen_at', '>=', now()->subMinutes(5))->count() }} online</div>
     @auth
+      @if(Auth::user()->is_admin)
+        <a href="{{ route('admin.dashboard') }}" style="color: var(--pink); font-weight: 700; margin-right: 15px; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; text-decoration: none; border: 1px solid var(--pink); padding: 4px 8px; border-radius: 4px;">[ADMIN]</a>
+      @endif
       <span style="color: var(--cyan); font-weight: 700; margin-right: 10px; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;">{{ Auth::user()->name }}</span>
       <form method="POST" action="{{ route('logout') }}" style="display:inline;">
         @csrf

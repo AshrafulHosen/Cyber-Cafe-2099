@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudyTable extends Model
 {
-    protected $fillable = ['name', 'color', 'activity', 'user_id', 'password'];
+    protected $fillable = ['name', 'color', 'activity', 'user_id', 'password', 'room_code'];
 
     public function owner()
     {

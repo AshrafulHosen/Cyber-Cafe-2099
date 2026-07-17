@@ -120,18 +120,22 @@ window.addEventListener('resize',initRain); initRain(); animRain();
 
 /* ── STATS COUNTER ── */
 }
-const statTargets = [2847,1293,48291,892341];
 if (document.getElementById('st1')) {
 const statIds=['st1','st2','st3','st4'];
-statIds.forEach((id,i)=>{
+statIds.forEach((id)=>{
+  const el = document.getElementById(id);
+  const target = parseInt(el.textContent.replace(/,/g, '')) || 0;
   let v=0;
-  const target=statTargets[i];
-  const step=Math.ceil(target/80);
-  const iv=setInterval(()=>{
-    v=Math.min(v+step,target);
-    document.getElementById(id).textContent=v.toLocaleString();
-    if(v>=target) clearInterval(iv);
-  },20);
+  if (target > 0) {
+    const step=Math.max(1, Math.ceil(target/40));
+    const iv=setInterval(()=>{
+      v=Math.min(v+step,target);
+      el.textContent=v.toLocaleString();
+      if(v>=target) clearInterval(iv);
+    },30);
+  } else {
+    el.textContent = "0";
+  }
 });
 
 /* ── AUDIO VISUALIZER ── */

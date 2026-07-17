@@ -26,6 +26,12 @@
       </div>
     @endif
 
+    @if(session('error'))
+      <div style="background: rgba(255, 47, 209, 0.1); border: 1px solid #ff2fd1; padding: 15px; border-radius: 12px; color: #ff2fd1; text-align: center; font-family: 'Rajdhani', sans-serif; font-size: 16px; margin-bottom: 20px;">
+          {{ session('error') }}
+      </div>
+    @endif
+
     <form method="POST" action="{{ route('login') }}">
       @csrf
 
