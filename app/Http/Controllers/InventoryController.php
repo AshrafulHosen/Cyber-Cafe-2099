@@ -47,6 +47,12 @@ class InventoryController extends Controller
             'status' => 'active'
         ]);
 
+        \App\Models\ActivityLog::create([
+            'user_id' => $user->id,
+            'type'    => 'STORE',
+            'message' => "Purchased {$item->name} from the cyber store."
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Purchase successful.',

@@ -37,6 +37,13 @@ class ChatController extends Controller
             'room'    => $room,
         ]);
 
+        $isBaristaRoom = \Illuminate\Support\Str::startsWith($room, 'barista_');
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'type'    => 'CHAT',
+            'message' => $isBaristaRoom ? 'Chatted with Nexus-7.' : 'Sent a message in the global café.'
+        ]);
+
         $aiReply = null;
         
         // Trigger AI if mentioned in global chat OR if we're in the private barista room

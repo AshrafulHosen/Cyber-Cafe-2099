@@ -45,6 +45,12 @@ class StudyRoomController extends Controller
             'room_code' => strtoupper(Str::random(4))
         ]);
 
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'type'    => 'STUDY',
+            'message' => "Created a new study table: {$table->name}"
+        ]);
+
         return redirect()->route('study.show', $table->id);
     }
 
@@ -63,6 +69,12 @@ class StudyRoomController extends Controller
                 $session->active = true;
                 $session->started_at = now();
                 $session->save();
+                
+                \App\Models\ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'type'    => 'STUDY',
+                    'message' => "Joined study table: {$table->name}"
+                ]);
             }
         }
 
